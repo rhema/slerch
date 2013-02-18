@@ -13,9 +13,9 @@ $(document).ready(function() {
 	console.log("TERST");
 });
 
-function ret_score(obj)
+function ret_score(a, b)
 {
-	return obj['score'];
+	return a.score - b.score;
 }
 
 function search_from_text()//returns dict of scores and indexes ... perhaps set should be pre dict-ed
