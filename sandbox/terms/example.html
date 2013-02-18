@@ -1,0 +1,129 @@
+<html>
+<head>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<!--<script type="text/javascript" src="dictionary.js"></script>-->
+
+
+<script>
+
+    var punct='\\['+ '\\!'+ '\\"'+ '\\#'+ '\\$'+   // since javascript does not
+          '\\%'+ '\\&'+ '\\\''+ '\\('+ '\\)'+  // support POSIX character
+          '\\*'+ '\\+'+ '\\,'+ '\\\\'+ '\\-'+  // classes, we'll need our
+          '\\.'+ '\\/'+ '\\:'+ '\\;'+ '\\<'+   // own version of [:punct:]
+          '\\='+ '\\>'+ '\\?'+ '\\@'+ '\\['+
+          '\\]'+ '\\^'+ '\\_'+ '\\`'+ '\\{'+
+          '\\|'+ '\\}'+ '\\~'+ '\\]';
+
+    var re=new RegExp(     // tokenizer
+       '\\s*'+            // discard possible leading whitespace
+       '('+               // start capture group
+         '\\.{3}'+            // ellipsis (must appear before punct)
+       '|'+               // alternator
+         '\\w+\\-\\w+'+       // hyphenated words (must appear before punct)
+       '|'+               // alternator
+         '\\w+\'(?:\\w+)?'+   // compound words (must appear before punct)
+       '|'+               // alternator
+         '\\w+'+              // other words
+       '|'+               // alternator
+         '['+punct+']'+        // punct
+       ')'                // end capture group
+     );
+
+// grep(ary[,filt]) - filters an array
+//   note: could use jQuery.grep() instead
+// @param {Array}    ary    array of members to filter
+// @param {Function} filt   function to test truthiness of member,
+//   if omitted, "function(member){ if(member) return member; }" is assumed
+// @returns {Array}  all members of ary where result of filter is truthy
+function grep(ary,filt) {
+  var result=[];
+  for(var i=0,len=ary.length;i++<len;) {
+    var member=ary[i]||'';
+    if(filt && (typeof filt === 'Function') ? filt(member) : member) {
+      result.push(member);
+    }
+  }
+  return result;
+}
+
+//var tokens=grep( str.split(re) );   // note: filter function omitted 
+                                     //       since all we need to test 
+                                     //       for is truthiness
+//////above via modified http://stackoverflow.com/questions/6162600/how-do-you-split-a-javascript-string-by-spaces-and-punctuation
+
+
+function show_all_included_words()
+{
+//  var words = //$("#words").val().toLowerCase().split(/\W+/);
+  var words = grep( $("#words").val().toLowerCase().split(re) );
+
+  //console.log("1");
+  //console.log(words);
+  
+  var output = "";
+  for(var i in words)
+  {
+     if(!(words[i].match("^[a-z]+$")))
+        continue;//skip empty
+     var the_idf = Math.log(total_words/(term_dictionary["the"]));
+     var idf = Math.log(total_words/(term_dictionary[words[i]]));
+     idf -= the_idf;
+     
+     //console.log(idf);
+     idf = idf;
+     if(words[i] in term_dictionary)
+     {
+        //console.log("output:"+words[i]+" idf "+idf)
+         output += " <font size='"+idf+"'>"+words[i]+"</font>";//1
+     }
+  }
+    //console.log("2");
+  $("#outspot").html(output);
+    //console.log("3");
+
+}
+
+var dictionary_has_loaded = 0;
+
+function loadDictionary()
+{
+  $.ajaxSetup({
+    cache: true
+  });
+  $.getScript("/lib/dictionary.js", function(data, textStatus, jqxhr) {
+   $("#header_text").html("Dictionary is loaded. Type or paste text");
+   dictionary_has_loaded = 1;
+   show_all_included_words();
+  });
+}
+
+$(document).ready(function() {
+
+  loadDictionary();
+  $("#words").keyup( function(event) {
+  if(dictionary_has_loaded)
+  {
+    show_all_included_words();
+  }
+  //console.log("typed");
+  
+  });
+  
+  
+});
+
+</script>
+
+
+
+  <title>Test</title>
+</head>
+
+<h1 id="header_text">Loading dictionary... Please wait.</h1>
+
+<textarea id="words" rows="10" cols="120"></textarea>
+<div id="outspot">
+</div>
+
+</html>
