@@ -1,0 +1,60 @@
+<html>
+<head>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<script type="text/javascript" src="/lib/cosine_search.js"></script>
+  <title>Test COS</title>
+</head>
+
+<script>
+
+$(document).ready(function() {
+	cos_search_setup();
+	console.log("TERST");
+});
+
+function ret_score(obj)
+{
+	return obj['score'];
+}
+
+function search_from_text()//returns dict of scores and indexes ... perhaps set should be pre dict-ed
+{
+	var query = $("#words").val();
+	var set = wiki_text;
+	console.log("attempting to search..."+query);
+	var scores = get_scores(query,set);
+	console.log(scores);
+	var prints = [];
+	for(var i in scores)
+	{
+		prints.push({'score':scores[i],'text':set[i]});
+	}
+	prints = prints.sort(ret_score);
+	prints = prints.reverse();
+	console.log(prints);
+	$("#results").empty();
+	for(var i in prints)
+	{
+		console.log(prints[i]);
+		$("#results").append("<p>"+prints[i]['score']+"->"+prints[i]['text']+"</p>");
+	}
+}
+
+</script>
+
+<h1 id="header_text">Loading dictionary... Please wait.</h1>
+
+<textarea id="words" rows="10" cols="120"></textarea>
+<div id="outspot">
+</div>
+
+<div>
+	<h3>Actions</h3>
+	<input type="button" value="search" onclick="javascript:search_from_text()"/>
+</div>
+<div id="results">
+	
+</div>
+
+</html>
