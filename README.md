@@ -1,7 +1,7 @@
 slerch
 ======
 
-situated search box for now
+javascript search
 
 Use:
 python -m SimpleHTTPServer 9000
